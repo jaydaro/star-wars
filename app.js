@@ -1,6 +1,7 @@
 const express = require('express');
-const app = express();
-const api = require('./api');
+const app     = express();
+const api     = require('./api');
+
 const port = 3000;
 
 app.set('view engine', 'ejs');
@@ -15,7 +16,7 @@ app.get('/characters', function (req, res) {
   api.getCharacters(req, res)
 });
 
-app.get('/planetresidents', function (req,res) {
+app.get('/planetresidents', function (req, res) {
   console.log('api/planetresidents');
   api.getPlanetResidents(req, res)
 });

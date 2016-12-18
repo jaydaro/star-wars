@@ -31,7 +31,7 @@ const Api = {
 
   /**
    * This method will get 50 characters info from the api
-   * will sort by :height, :weight, name
+   * will sort by ?sort=height, ?sort=weight, ?sort=name
    */
 
   getCharacters(req, res) {
@@ -57,8 +57,8 @@ const Api = {
     getCharacterData(options, allData)
     .then(response => {
       let sortedData = _.sortBy(response, [character => {
-        character.height = parseFloat(character.height.replace(/,/g, ''));
-        character.mass   = parseFloat(character.mass.replace(/,/g, ''));
+        character.height = numberCleaner(character.height);
+        character.mass   = numberCleaner(character.mass);
         return character[sortField]
       }]);
       res.send(sortedData);
@@ -79,17 +79,17 @@ const Api = {
     getSwapiData(options, allData)
     .then(planets => {
       return _.reduce(planets, (acc, planet) => {
-          acc[planet.name] = bPromise.all(_.map(planet.residents, url => {
-              if (url) {
-                return rp({uri: url})
-                .then(response => {
-                  return JSON.parse(response).name;
-                })
-              }
-            })
-          );
-          return acc;
-        }, {});
+        acc[planet.name] = bPromise.all(_.map(planet.residents, url => {
+            if (url) {
+              return rp({uri: url})
+              .then(response => {
+                return JSON.parse(response).name;
+              })
+            }
+          })
+        );
+        return acc;
+      }, {});
     })
     .props()
     .then(allPlanets => {
@@ -120,7 +120,6 @@ const Api = {
       }, {concurrency: 10});
     })
     .then(vehicles => {
-
       let sortedVehicles = _.chain(vehicles)
       .uniqBy('name')
       .sortBy('pilots'.length)
@@ -147,18 +146,17 @@ const Api = {
     .then(films => {
       allFilms = films;
       return _.reduce(films, (acc, film) => {
-          acc[film.episode_id] = bPromise.all(_.map(film.characters, url => {
-              if (url) {
-                return rp({uri: url})
-                .then(response => {
-                  // let weight = parseFloat(JSON.parse(response).mass.replace(/,/g, ''));
-                  return parseFloat(JSON.parse(response).mass.replace(/,/g, ''));
-                })
-              }
-            })
-          );
-          return acc;
-        }, {});
+        acc[film.episode_id] = bPromise.all(_.map(film.characters, url => {
+            if (url) {
+              return rp({uri: url})
+              .then(response => {
+                return numberCleaner(JSON.parse(response).mass);
+              })
+            }
+          })
+        );
+        return acc;
+      }, {});
     })
     .props()
     .then((data) => {
@@ -189,6 +187,10 @@ getSwapiData = (options, allData) => {
     return _.flatten(allData);
   })
   .catch(err => console.log(err))
+};
+
+numberCleaner = value => {
+  return parseFloat(value.replace(/,/g, ''));
 };
 
 
