@@ -1,0 +1,16 @@
+
+<% if (error) { %>
+<h1><%= error %></h1>
+<h2>You may want to try that again</h2>
+<% } else { %>
+<h1>Character Info for <%= character.name %></h1>
+<ul>
+    <li>Name: <%= character.name %> </li>
+    <li>Height: <%= character.height %></li>
+    <li>Mass: <%= character.mass %></li>
+    <li>Hair Color: <%= character.hair_color %></li>
+    <li>Eye Color: <%= character.eye_color %></li>
+    <li>Gender: <%= character.gender %></li>
+    <li>Birth Year: <%= character.birth_year %></li>
+</ul>
+<% } %>
